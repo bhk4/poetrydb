@@ -1060,3 +1060,22 @@ describe('Exact word search (:word modifier):', {:type => :feature}) do
   end
 
 end
+
+describe 'Author info endpoint' do
+  # The test harness seeds only the poetry collection, so these specs exercise
+  # the route's discrimination logic; a seeded-bio spec runs post-deploy against
+  # production data.
+  it('unknown author returns a not-found status') do
+    response = TestHttp.get('/author/Nonexistent%20Poet/info')
+    expect(response.body).to include('404')
+    expect(response.body).to include('No author found')
+    expect(response.code).to be 200
+  end
+
+  it('known author without a bio explains the absence') do
+    response = TestHttp.get('/author/Emily%20Dickinson/info')
+    expect(response.body).to include('404')
+    expect(response.body).to include('No biography available yet')
+    expect(response.code).to be 200
+  end
+end

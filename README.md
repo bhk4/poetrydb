@@ -276,6 +276,53 @@ linecount
 16
 ```
 
+#### Author biography
+
+Every author also has a structured biography, served from a dedicated endpoint:
+
+Format:
+```
+/author/<author>/info
+```
+Example:
+```
+/author/Emily Dickinson/info
+```
+Result:
+```
+{
+  "name": "Emily Dickinson",
+  "full_name": "Emily Elizabeth Dickinson",
+  "born": "1830",
+  "died": "1886",
+  "nationality": "American",
+  "period": "19th century",
+  "movements": [],
+  "poem_count": 362,
+  "forms": [ "lyric" ],
+  "themes": [ "death", "faith and religion", "nature", "love", "pain and grief" ],
+  "notable_poems": [
+    { "title": "Because I could not stop for Death", "in_corpus": false },
+    { "title": "\"Hope\" is the thing with feathers", "in_corpus": true },
+    .
+    .
+  ],
+  "summary": "Emily Dickinson (1830–1886) was an American poet. Although little of her work was published during her lifetime, she is today regarded as one of the central figures of American literature. ...",
+  "sources": [
+    { "name": "Emily Dickinson Museum (Amherst College)", "url": "https://www.emilydickinsonmuseum.org/emily-dickinson/biography/" },
+    .
+    .
+  ],
+  "further_reading": [ ... ]
+}
+```
+
+Notes:
+1. `poem_count` is always the live number of the author's poems in PoetryDB.
+2. Each entry in `notable_poems` carries `in_corpus`: when `true`, the title is the exact PoetryDB title string, so the poem can be fetched directly, e.g. `/title/"Hope" is the thing with feathers:abs`. When `false`, the poem is not (yet) in the database.
+3. `sources` lists the publicly accessible references each biography rests on; `further_reading` points to good material that may require library access.
+4. Biographies are generated from credible public sources and evaluated for faithfulness before publication. If you spot something that seems off, please open an issue.
+
 ### Title
 
 <b>General Format:</b>
