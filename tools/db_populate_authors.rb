@@ -1,0 +1,28 @@
+# Populate the `authors` collection from a JSON fixture (test harness use).
+# Mirrors db_populate.rb, which loads the poetry collection.
+#
+#   ruby tools/db_populate_authors.rb tools/test_authors.json
+
+require 'mongo'
+require 'json'
+require 'bson'
+
+include Mongo
+
+json_inputfile = ARGV[0]
+mongo_uri = ENV['MONGODB_URI']
+db_username = ENV['MONGODB_USER']
+db_password = ENV['MONGODB_PASS']
+
+db_name = mongo_uri[%r{/([^/\?]+)(\?|$)}, 1]
+client = Mongo::Client.new(mongo_uri, :database => db_name, :user => db_username, :password => db_password)
+db = client.database
+
+coll = db.collection("authors")
+coll.delete_many({})
+
+@data = JSON.parse(IO.read("#{json_inputfile}"))
+
+@data['authors'].each do |author|
+  coll.insert_one(author)
+end

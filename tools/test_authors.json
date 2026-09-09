@@ -1,0 +1,52 @@
+{
+  "authors": [
+    {
+      "name": "Emily Dickinson",
+      "full_name": "Emily Elizabeth Dickinson",
+      "born": "1830",
+      "died": "1886",
+      "nationality": "American",
+      "period": "19th century",
+      "movements": [],
+      "poem_count": 362,
+      "forms": ["lyric"],
+      "themes": ["death", "faith and religion", "nature"],
+      "notable_poems": [
+        { "title": "Said Death to Passion", "in_corpus": true },
+        { "title": "Because I could not stop for Death", "in_corpus": false }
+      ],
+      "summary": "Emily Dickinson (1830-1886) was an American poet, today regarded as one of the central figures of American literature. TEST FIXTURE BIO.",
+      "sources": [
+        { "name": "Emily Dickinson Museum (Amherst College)", "url": "https://www.emilydickinsonmuseum.org/emily-dickinson/biography/" }
+      ],
+      "further_reading": [],
+      "_provenance": {
+        "status": "TEST FIXTURE — this editorial block must NEVER be served",
+        "secret_marker": "EDITORIAL_MUST_NOT_LEAK"
+      },
+      "_eval": {
+        "essentials": [{ "claim": "must not leak either", "category": "identity" }]
+      }
+    },
+    {
+      "name": "Ernest Dowson",
+      "full_name": "Ernest Christopher Dowson",
+      "born": "1867",
+      "died": "1900",
+      "nationality": "English",
+      "period": "Victorian (fin de siècle)",
+      "movements": ["Decadent movement"],
+      "poem_count": 999,
+      "forms": ["lyric"],
+      "themes": ["love", "loss"],
+      "notable_poems": [
+        { "title": "The Moon Maiden's Song", "in_corpus": true }
+      ],
+      "summary": "Ernest Dowson (1867-1900) was an English poet of the Decadent movement. TEST FIXTURE BIO.",
+      "sources": [
+        { "name": "Poetry Foundation", "url": "https://www.poetryfoundation.org/poets/ernest-dowson" }
+      ],
+      "further_reading": []
+    }
+  ]
+}

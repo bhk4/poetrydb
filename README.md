@@ -282,15 +282,17 @@ Every author also has a structured biography, served from a dedicated endpoint:
 
 Format:
 ```
-/author/<author>/info
+/author/<author>[:abs]/info
 ```
+Matching works like any other author search: case-insensitive substring by default, exact name with `:abs`. The result is an array of every matching biography (usually one).
+
 Example:
 ```
-/author/Emily Dickinson/info
+/author/Dickinson/info
 ```
 Result:
 ```
-{
+[{
   "name": "Emily Dickinson",
   "full_name": "Emily Elizabeth Dickinson",
   "born": "1830",
@@ -314,7 +316,7 @@ Result:
     .
   ],
   "further_reading": [ ... ]
-}
+}]
 ```
 
 Notes:

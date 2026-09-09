@@ -1062,20 +1062,83 @@ describe('Exact word search (:word modifier):', {:type => :feature}) do
 end
 
 describe 'Author info endpoint' do
-  # The test harness seeds only the poetry collection, so these specs exercise
-  # the route's discrimination logic; a seeded-bio spec runs post-deploy against
-  # production data.
+  # Bios are seeded from tools/test_authors.json: Emily Dickinson and Ernest
+  # Dowson have fixture bios; Bob Willett has poems but NO bio.
+
+  it('returns the biography for an exact author name') do
+    response = TestHttp.get('/author/Emily%20Dickinson/info')
+    bios = JSON.parse(response.body)
+    expect(bios).to be_an(Array)
+    expect(bios.length).to be 1
+    expect(bios[0]['name']).to eq 'Emily Dickinson'
+    expect(bios[0]['summary']).to include('American poet')
+    expect(response.code).to be 200
+  end
+
+  it('matches by substring, like other author searches') do
+    response = TestHttp.get('/author/Dickinson/info')
+    bios = JSON.parse(response.body)
+    expect(bios.length).to be 1
+    expect(bios[0]['name']).to eq 'Emily Dickinson'
+  end
+
+  it('returns ALL matching biographies for a shared substring') do
+    # "son" matches both Dickinson and Dowson
+    response = TestHttp.get('/author/son/info')
+    bios = JSON.parse(response.body)
+    expect(bios.map { |b| b['name'] }).to eq ['Emily Dickinson', 'Ernest Dowson']
+  end
+
+  it(':abs requires an exact name') do
+    response = TestHttp.get('/author/Emily%20Dickinson:abs/info')
+    expect(JSON.parse(response.body)[0]['name']).to eq 'Emily Dickinson'
+
+    response = TestHttp.get('/author/Dickinson:abs/info')
+    expect(response.body).to include('404')
+  end
+
+  it('poem_count is computed live from the corpus, not the stored snapshot') do
+    # fixture bio stores poem_count 362; the harness corpus holds 2 Dickinson poems
+    response = TestHttp.get('/author/Emily%20Dickinson/info')
+    expect(JSON.parse(response.body)[0]['poem_count']).to be 2
+
+    # Dowson's fixture stores 999; the harness corpus holds 1
+    response = TestHttp.get('/author/Dowson/info')
+    expect(JSON.parse(response.body)[0]['poem_count']).to be 1
+  end
+
+  it('never serves editorial layers') do
+    # the Dickinson fixture deliberately carries _provenance/_eval blocks
+    response = TestHttp.get('/author/Emily%20Dickinson/info')
+    expect(response.body).not_to include('_provenance')
+    expect(response.body).not_to include('_eval')
+    expect(response.body).not_to include('EDITORIAL_MUST_NOT_LEAK')
+  end
+
+  it('notable_poems carry the in_corpus cross-linking contract') do
+    response = TestHttp.get('/author/Emily%20Dickinson/info')
+    notable = JSON.parse(response.body)[0]['notable_poems']
+    in_corpus = notable.select { |n| n['in_corpus'] }.map { |n| n['title'] }
+    absent    = notable.reject { |n| n['in_corpus'] }.map { |n| n['title'] }
+    expect(in_corpus).to include('Said Death to Passion')
+    expect(absent).to include('Because I could not stop for Death')
+
+    # an in_corpus title is fetchable directly, exactly as documented
+    poem = TestHttp.get('/title/Said%20Death%20to%20Passion:abs')
+    expect(poem.body).to include('Emily Dickinson')
+  end
+
+  it('known author without a bio explains the absence') do
+    response = TestHttp.get('/author/Bob%20Willett/info')
+    expect(response.body).to include('404')
+    expect(response.body).to include('No biography available yet')
+    expect(response.code).to be 200
+  end
+
   it('unknown author returns a not-found status') do
     response = TestHttp.get('/author/Nonexistent%20Poet/info')
     expect(response.body).to include('404')
     expect(response.body).to include('No author found')
-    expect(response.code).to be 200
-  end
-
-  it('known author without a bio explains the absence') do
-    response = TestHttp.get('/author/Emily%20Dickinson/info')
-    expect(response.body).to include('404')
-    expect(response.body).to include('No biography available yet')
     expect(response.code).to be 200
   end
 end
